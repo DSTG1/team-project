@@ -34,11 +34,10 @@ class SNOTEL:
 	def download_sites(self, num_days):
 
 		# Total data
-		self.site_data = {}
+		self.station_data = {}
 		for i in range(self.num_stations):
 			if i % 100 == 0:
 				print(f'Downloaded {i} stations...')
-
 			try:
 				# Grab individual site
 				site = requests.get(self.api + 'station/' + self.stations.json()[i]['triplet'], params={'days':num_days}).json()
@@ -47,16 +46,16 @@ class SNOTEL:
 				data = site['data']
 				df_site = pd.DataFrame.from_records(data)
 				# Storing individual site into a dictionary
-				self.site_data[self.df_stations['name'][i]] = df_site
+				self.station_data[self.df_stations['name'][i]] = df_site
 
 			except ValueError:
 
 				# Don't store station if it throws a ValueError (JSONDecodeError in this case)
 				print(f'Station: {self.df_stations["name"][i]} (Index: {i}) is no longer supported (Internal Server Error).')
 
-	def graph_site(self, site_key, save_path=None):
+	def graph_site(self, site_key):
 
-		df_site = self.site_data[site_key]
+		df_site = self.station_data[site_key]
 
 		snow_water_equivalent = df_site['Snow Water Equivalent (in)']
 		change_snow_water_equivalent = df_site['Change In Snow Water Equivalent (in)']
